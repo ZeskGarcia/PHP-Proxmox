@@ -13,12 +13,12 @@ class Proxmox {
     public function __construct($config)
     {
         if (is_array($config)) {
-            $this->apiUrl = $config['url'] . "/api2/json";
+            $this->apiUrl = "https://" . $config['url'] . ":8006/api2/json";
             $this->username = $config['user'];
             $this->password = $config['pass'];
             $this->realm = $config['realm'];
         } else {
-            $this->apiUrl = $config . "/api2/json";
+            $this->apiUrl = "https://" . $config . ":8006/api2/json";
             $this->username = func_get_arg(1);
             $this->password = func_get_arg(2);
             $this->realm = func_get_arg(3);
@@ -51,5 +51,13 @@ class Proxmox {
         return true;
       } else 
         return false;
+    }
+
+    public function getNodes()
+    {
+        if (empty($this->ticket) || empty($this->CSRFPreventionToken))
+            if (!this->login())
+                return false;
+        
     }
 }
