@@ -98,11 +98,33 @@ class Proxmox {
             if (!$this->login())
                 return false;
 
-        $nodeInfoUrl = $this->apiUrl . '/nodes/' . $nodeName . '/status';
-        $response = $this->curlRequest($nodeInfoUrl);
-        $nodeInfoResult = json_decode($response, true);
-        if (isset($nodeInfoResult['data'])) 
-            return $nodeInfoResult['data'];
+        $apiURL = $this->apiUrl . '/nodes/' . $nodeName . '/status';
+        $response = $this->Request($apiURL);
+        $result = json_decode($response, true);
+        if (isset($result['data'])) 
+            return $result['data'];
+        else
+            return false;
+    }
+
+    public function shutdownVM($node, $vmId)
+    {
+        if (empty($this->ticket) || empty($this->CSRFPreventionToken))
+            if (!$this->login())
+                return false;
+
+        $apiURL = $this->apiUrl . '/nodes/' . $node . '/qemu/' . $vmId . '/status/shutdown';
+
+        $requestOptions = [
+            CURLOPT_CUSTOMREQUEST => 'POST'
+        ];
+
+        $request = $this->Request($apiURL, 'POST', []);
+
+        $result = json_decode($request, true);
+
+        if (isset($result['data']) && $result['data'] == 'OK')
+            return true;
         else
             return false;
     }
