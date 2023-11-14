@@ -17,12 +17,8 @@ class Proxmox {
             $this->username = $config['user'];
             $this->password = $config['pass'];
             $this->realm = $config['realm'];
-        } else {
-            $this->apiUrl = "https://" . $config . ":8006/api2/json";
-            $this->username = func_get_arg(1);
-            $this->password = func_get_arg(2);
-            $this->realm = func_get_arg(3);
-        }
+        } else
+            return false;
     }
 
     public function login()
@@ -92,6 +88,21 @@ class Proxmox {
 
         if (isset($result['data']))
             return $result['data'];
+        else
+            return false;
+    }
+
+    public function getNodeInfo($nodeName)
+    {
+        if (empty($this->ticket) || empty($this->CSRFPreventionToken))
+            if (!$this->login())
+                return false;
+
+        $nodeInfoUrl = $this->apiUrl . '/nodes/' . $nodeName . '/status';
+        $response = $this->curlRequest($nodeInfoUrl);
+        $nodeInfoResult = json_decode($response, true);
+        if (isset($nodeInfoResult['data'])) 
+            return $nodeInfoResult['data'];
         else
             return false;
     }
