@@ -53,10 +53,46 @@ class Proxmox {
         return false;
     }
 
+    public function Request($url, $method = 'GET', $data = [])
+    {
+        $ch = curl_init();
+        $options = [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'CSRFPreventionToken: ' . $this->CSRFPreventionToken,
+            ],
+            CURLOPT_COOKIE => "PVEAuthCookie=" . $this->ticket
+        ];
+
+        if ($method === 'POST') {
+            $options[CURLOPT_POST] = true;
+            $options[CURLOPT_POSTFIELDS] = http_build_query($data);
+        }
+
+        curl_setopt_array($ch, $options);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+    
+        return $response;
+    }
+    
     public function getNodes()
     {
         if (empty($this->ticket) || empty($this->CSRFPreventionToken))
             if (!this->login())
                 return false;
+        
+        $apiURL = $this->apiUrl . '/nodes';
+
+        $response = $this->Request($apiURL);
+
+        $result = json_decode($response, 1);
+
+        if (isset($result['data']))
+            return $result['data'];
+        else
+            return false;
     }
 }
