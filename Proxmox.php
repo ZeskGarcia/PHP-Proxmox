@@ -112,6 +112,9 @@ class Proxmox {
         if (empty($this->ticket) || empty($this->CSRFPreventionToken))
             if (!$this->login())
                 return false;
+        else
+            if (empty($node) || empty($vmId))
+                return false;
 
         $apiURL = $this->apiUrl . '/nodes/' . $node . '/qemu/' . $vmId . '/status/shutdown';
 
@@ -126,6 +129,67 @@ class Proxmox {
         if (isset($result['data']) && $result['data'] == 'OK')
             return true;
         else
+            return false;
+    }
+
+    public function startVM($node, $vmId)
+    {
+        if (empty($this->ticket) || empty($this->CSRFPreventionToken))
+            if (!$this->login())
+                return false;
+        else
+            if (empty($node) || empty($vmId))
+                return false;
+        
+        $apiURL = $this->apiUrl . '/nodes/' . $node . '/qemu/' . $vmId . '/status/start';
+
+        $request = $this->Request($apiURL, 'POST', []);
+
+        $result = json_decode($request, true);
+        
+        if (isset($result['data']) && $result['data'] == 'OK')
+            return true;
+        else 
+            return false;
+    }
+
+    public function stopVM($node, $vmId)
+    {
+        if (empty($this->ticket) || empty($this->CSRFPreventionToken))
+            if (!$this->login())
+                return false;
+        else
+            if (empty($node) || empty($vmId))
+                return false;
+        
+        $apiURL = $this->apiUrl . '/nodes/' . $node . '/qemu/' . $vmId . '/status/stop';
+
+        $request = $this->Request($apiURL, 'POST', []);
+
+        $result = json_decode($request, true);
+        
+        if (isset($result['data']) && $result['data'] == 'OK')
+            return true;
+        else 
+            return false;
+    }
+
+    public function getPVEVersion()
+    {
+
+        if (empty($this->ticket) || empty($this->CSRFPreventionToken))
+            if (!$this->login())
+                return false;
+        
+        $apiURL = $this->apiURL . '/version';
+
+        $request = $this->Request($apiURL, 'GET', []);
+
+        $result = json_decode($request, true);
+        
+        if (isset($result['data']))
+            return $result['data']['version'];
+        else 
             return false;
     }
 }
