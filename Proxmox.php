@@ -58,6 +58,5 @@ class Proxmox {
         if (empty($this->ticket) || empty($this->CSRFPreventionToken))
             if (!this->login())
                 return false;
-        
     }
 }
