@@ -81,7 +81,7 @@ class Proxmox {
     public function getNodes()
     {
         if (empty($this->ticket) || empty($this->CSRFPreventionToken))
-            if (!this->login())
+            if (!$this->login())
                 return false;
         
         $apiURL = $this->apiUrl . '/nodes';
